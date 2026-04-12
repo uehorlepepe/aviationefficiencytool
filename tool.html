@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Machine Learning–Based Aviation Fuel Efficiency and Operational Inefficiency Detection System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f4;
+            color: #1a1a18;
+        }
+
+
+        h1 {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+       
+        p {
+            color:#6b6b68;
+            margin-bottom: 2rem;
+        }
+
+
+        form {
+            background: white;
+            border: 1px solid #e2e2df;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+       
+        label {
+            display: block;
+            font-size: 13px;
+            color: #6b6b68;
+            margin-top: 1rem;
+            margin-bottom: 4px;
+        }
+
+
+        input, select {
+            width: 100%;
+            height: 38px;
+            padding: 0 10px;
+            border:1px solid #e2e2df;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+
+        button {
+            width: 100%;
+            height: 42px;
+            margin-top: 1.5rem;
+            background: #1a1a18;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+       
+    </style>
+    <script>
+        function runAnalysis() {
+            event.preventDefault();
+            const origin = document.getElementById("origin").value;
+            const destination = document.getElementById("destination").value;
+            const aircraft = document.getElementById("aircraft").value;
+            const passengers = document.getElementById("passengers").value;
+            const cargo = document.getElementById("cargo").value;
+            const wind = document.getElementById("wind").value;
+            const cruise_temp = document.getElementById("cruise_temp").value;
+            document.getElementById("run-btn").textContent = "Run Analysis";
+            document.getElementById("run-btn").disabled = false;
+        fetch("http://localhost:5000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ origin, destination, aircraft, passengers, cargo, wind, cruise_temp })
+        })
+        .then(response => response.json())
+        .then(data => {
+    document.getElementById("results").style.display = "block";
+    document.getElementById("r-fuel").textContent = data.fuel.replace("Predicted Fuel Burn: ", "").replace(" L", "");
+    document.getElementById("r-eff").textContent = data.efficiency.replace("Efficiency: ", "").replace(" pkm/L", "");
+   
+    const recList = document.getElementById("r-recs");
+    recList.innerHTML = "";
+    data.recommendations.forEach(rec => {
+        const li = document.createElement("li");
+        li.style.cssText = "padding: 10px 0; border-bottom: 1px solid #f0f0ee; font-size: 14px; line-height: 1.5;";
+        li.textContent = rec;
+        recList.appendChild(li);
+    });
+
+
+    document.getElementById("run-btn").textContent = "Run Analysis";
+    document.getElementById("run-btn").disabled = false;
+});
+}
+    </script>
+</head>
+<body>
+    <h1>Machine Learning–Based Aviation Fuel Efficiency and Operational Inefficiency Detection System</h1>
+    <p>By Yifan Wang</p>
+    <form>
+        <label>Origin Airport (IATA)</label>
+        <input type="text" id="origin" placeholder="e.g. YYZ">
+
+
+        <label>Destination Airport (IATA)</label>
+        <input type="text" id="destination" placeholder="e.g. LHR">
+
+
+        <label>Aircraft type</label>
+    <select id="aircraft">
+        <option value="">Select aircraft...</option>
+        <option>Boeing 787-9</option>
+        <option>Boeing 787-8</option>
+        <option>Boeing 787-10</option>
+        <option>Boeing 777-300ER</option>
+        <option>Boeing 777-200ER</option>
+        <option>Boeing 767-300ER</option>
+        <option>Boeing 737-800</option>
+        <option>Boeing 737-900ER</option>
+        <option>Boeing 737-700</option>
+        <option>Boeing 737 MAX 7</option>
+        <option>Boeing 737 MAX 8</option>
+        <option>Boeing 737 MAX 9</option>
+        <option>Boeing 737 MAX 10</option>
+        <option>Boeing 757-200</option>
+        <option>Airbus A380-800</option>
+        <option>Airbus A350-900</option>
+        <option>Airbus A330-200</option>
+        <option>Airbus A330-300</option>
+        <option>Airbus A330-900</option>
+        <option>Airbus A321neo</option>
+        <option>Airbus A321ceo</option>
+        <option>Airbus A320neo</option>
+        <option>Airbus A320ceo</option>
+        <option>Airbus A319neo</option>
+        <option>Airbus A319ceo</option>
+        <option>Airbus A220-300</option>
+        <option>Embraer E190</option>
+        <option>Embraer E175</option>
+        <option>Embraer ERJ-145</option>
+        <option>Bombardier CRJ-900</option>
+    </select>
+
+
+        <label>Passengers</label>
+        <input type="number" id="passengers" placeholder="e.g. 250">
+
+
+        <label>Cargo load (%)</label>
+        <input type="number" id="cargo" placeholder="e.g. 70">
+
+
+        <label>Wind Speed (kts)</label>
+        <input type="number" id="wind" placeholder="negative = tailwind">
+
+
+        <label>Cruise Temperature (°C)</label>
+        <input type="number" id="cruise_temp" placeholder="e.g. -55">
+
+
+    <button type="button" id="run-btn" onclick="runAnalysis()">Run Analysis</button>  
+    </form>
+    <div id="results" style="display:none; margin-top: 2rem;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div style="background: white; border: 1px solid #e2e2df; border-radius: 12px; padding: 1rem;">
+            <p style="font-size: 12px; color: #6b6b68; margin-bottom: 4px;">Predicted fuel burn</p>
+            <p style="font-size: 24px; font-weight: 500; color: #1a1a18; margin: 0;" id="r-fuel">—</p>
+            <p style="font-size: 12px; color: #6b6b68; margin: 0;">litres</p>
+        </div>
+        <div style="background: white; border: 1px solid #e2e2df; border-radius: 12px; padding: 1rem;">
+            <p style="font-size: 12px; color: #6b6b68; margin-bottom: 4px;">Efficiency score</p>
+            <p style="font-size: 24px; font-weight: 500; color: #1a1a18; margin: 0;" id="r-eff">—</p>
+            <p style="font-size: 12px; color: #6b6b68; margin: 0;">pkm / L</p>
+        </div>
+    </div>
+    <div style="background: white; border: 1px solid #e2e2df; border-radius: 12px; padding: 1.5rem;">
+        <p style="font-size: 11px; font-weight: 600; color: #6b6b68; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 1rem;">Recommendations</p>
+        <ul id="r-recs" style="list-style: none; padding: 0; margin: 0;"></ul>
+    </div>
+</div>
+</body>
+</html>
+
+
+
+
+
