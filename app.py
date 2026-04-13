@@ -6,9 +6,13 @@ from sklearn.ensemble import GradientBoostingRegressor
 import pandas as pd
 import numpy as np
 from math import radians, sin, cos, sqrt, atan2
+from flask import send_from_directory
 import os
 app = Flask(__name__)
 CORS(app)
+@app.route("/")
+def index():
+    return send_from_directory(".", "tool.html")
 airports_df = pd.read_csv("globalairportsdata.csv")
 airports_df = airports_df[airports_df["IATA"].notna()].drop_duplicates(subset="IATA", keep="first")
 airport_coords = airports_df.set_index("IATA")[["GeoPointLat", "GeoPointLong"]].to_dict("index")
