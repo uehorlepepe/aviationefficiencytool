@@ -77,7 +77,7 @@
             const cruise_temp = document.getElementById("cruise_temp").value;
             document.getElementById("run-btn").textContent = "Run Analysis";
             document.getElementById("run-btn").disabled = false;
-        fetch("http://localhost:5000/predict", {
+        fetch("https://aviationefficiencytool.onrender.com/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ origin, destination, aircraft, passengers, cargo, wind, cruise_temp })
