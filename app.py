@@ -6,6 +6,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 import pandas as pd
 import numpy as np
 from math import radians, sin, cos, sqrt, atan2
+import os
 app = Flask(__name__)
 CORS(app)
 airports_df = pd.read_csv("globalairportsdata.csv")
@@ -157,4 +158,5 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+port = int(os.environ.get("PORT", 5000))
+app.run(host="0.0.0.0", port=port)
